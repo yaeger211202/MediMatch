@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: medimatch
+      POSTGRES_PASSWORD: medimatch
+      POSTGRES_DB: medimatch
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg2://medimatch:medimatch@db:5432/medimatch
+    ports:
+      - "8000:8000"
+volumes:
+  db_data:
