@@ -34,10 +34,12 @@ export default function Home() {
         <div className="feature-card">
           <h2>Doctor Visit Assistant</h2>
           <p>Generate better questions for your provider and prepare for more productive visits.</p>
+          <a className="secondary-button" href="/doctor-visit">Open assistant</a>
         </div>
         <div className="feature-card">
           <h2>AI Health Insights</h2>
           <p>Get educational summaries and discussion points without medical advice or treatment recommendations.</p>
+          <a className="secondary-button" href="/ai-insights">Open insights</a>
         </div>
       </section>
 

@@ -103,6 +103,25 @@ class DoctorQuestionBase(BaseModel):
     created_on: date
 
 
+class DoctorQuestionResponse(DoctorQuestionBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class DoctorQuestionListResponse(BaseModel):
+    questions: list[DoctorQuestionResponse] = []
+    suggestions: list[str] = []
+
+
 class AIInsightBase(BaseModel):
     summary: str
     generated_on: date
+
+
+class AIInsightResponse(AIInsightBase):
+    id: int
+
+    class Config:
+        orm_mode = True
