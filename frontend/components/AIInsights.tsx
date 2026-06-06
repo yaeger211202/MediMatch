@@ -15,6 +15,15 @@ export default function AIInsights() {
   const [status, setStatus] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus("Copied insight to clipboard.");
+    } catch {
+      setStatus("Unable to copy insight to clipboard.");
+    }
+  };
+
   const fetchInsights = async () => {
     try {
       const response = await fetch(`${API_BASE}/ai-insights`);
@@ -76,9 +85,12 @@ export default function AIInsights() {
         ) : (
           <div className="feature-card">
             {insights.map((insight) => (
-              <div key={insight.id} style={{ marginBottom: "20px" }}>
+              <div key={insight.id} style={{ marginBottom: "20px", display: "grid", gap: "10px" }}>
                 <p style={{ margin: 0, fontWeight: 700 }}>{new Date(insight.generated_on).toLocaleDateString()}</p>
                 <p style={{ margin: "8px 0 0", color: "#475569" }}>{insight.summary}</p>
+                <button type="button" className="copy-button" onClick={() => copyToClipboard(insight.summary)}>
+                  Copy summary
+                </button>
               </div>
             ))}
           </div>

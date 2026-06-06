@@ -234,6 +234,24 @@ textarea {
   gap: 12px;
 }
 
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #eef2ff;
+  color: #1e293b;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.copy-button:hover,
+.copy-button:focus-visible {
+  background: #dbeafe;
+}
+
 .status-banner {
   padding: 16px 20px;
   border-radius: 16px;

@@ -26,6 +26,15 @@ export default function DoctorVisitAssistant() {
   const [status, setStatus] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus("Copied to clipboard.");
+    } catch {
+      setStatus("Unable to copy to clipboard.");
+    }
+  };
+
   const fetchQuestions = async () => {
     try {
       const response = await fetch(`${API_BASE}/doctor-questions`);
@@ -107,9 +116,14 @@ export default function DoctorVisitAssistant() {
         ) : (
           <div className="feature-card">
             {suggestions.map((suggestion, index) => (
-              <p key={index} style={{ marginBottom: "16px" }}>
-                <strong>•</strong> {suggestion}
-              </p>
+              <div key={index} style={{ marginBottom: "18px", display: "grid", gap: "10px" }}>
+                <p style={{ margin: 0 }}>
+                  <strong>•</strong> {suggestion}
+                </p>
+                <button type="button" className="copy-button" onClick={() => copyToClipboard(suggestion)}>
+                  Copy suggestion
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -124,9 +138,12 @@ export default function DoctorVisitAssistant() {
         ) : (
           <div className="feature-card">
             {questions.map((question) => (
-              <div key={question.id} style={{ marginBottom: "18px" }}>
+              <div key={question.id} style={{ marginBottom: "18px", display: "grid", gap: "10px" }}>
                 <p style={{ margin: 0, fontWeight: 700 }}>{formatDate(question.created_on)}</p>
                 <p style={{ margin: "8px 0 0", color: "#475569" }}>{question.question}</p>
+                <button type="button" className="copy-button" onClick={() => copyToClipboard(question.question)}>
+                  Copy question
+                </button>
               </div>
             ))}
           </div>
