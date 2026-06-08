@@ -31,6 +31,7 @@ class Medication(Base):
     name = Column(String(256), nullable=False)
     dosage = Column(String(128), default="")
     frequency = Column(String(128), default="")
+    time_of_day = Column(String(128), default="")
     start_date = Column(Date, nullable=True)
     stop_date = Column(Date, nullable=True)
     user = relationship("User", back_populates="medications")

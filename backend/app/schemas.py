@@ -15,14 +15,14 @@ class DiagnosisBase(BaseModel):
 class DiagnosisResponse(DiagnosisBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class MedicationBase(BaseModel):
     name: str
     dosage: str | None = None
     frequency: str | None = None
+    time_of_day: str | None = None
     start_date: date | None = None
     stop_date: date | None = None
 
@@ -30,8 +30,7 @@ class MedicationBase(BaseModel):
 class MedicationResponse(MedicationBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class UserProfileBase(BaseModel):
@@ -50,8 +49,7 @@ class UserProfile(UserProfileBase):
     diagnoses: list[DiagnosisResponse] = []
     medications: list[MedicationResponse] = []
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class SymptomBase(BaseModel):
@@ -62,8 +60,7 @@ class SymptomBase(BaseModel):
 class SymptomResponse(SymptomBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class SymptomLogBase(BaseModel):
@@ -77,8 +74,7 @@ class SymptomLogResponse(SymptomLogBase):
     id: int
     symptom_name: str
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class MedicationChangeBase(BaseModel):
@@ -94,8 +90,7 @@ class MedicationChangeResponse(BaseModel):
     change_date: date
     note: str | None = None
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class DoctorQuestionBase(BaseModel):
@@ -106,8 +101,7 @@ class DoctorQuestionBase(BaseModel):
 class DoctorQuestionResponse(DoctorQuestionBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class DoctorQuestionListResponse(BaseModel):
@@ -123,5 +117,4 @@ class AIInsightBase(BaseModel):
 class AIInsightResponse(AIInsightBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}

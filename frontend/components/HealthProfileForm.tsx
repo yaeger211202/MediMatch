@@ -13,6 +13,7 @@ type MedicationItem = {
   name: string;
   dosage: string;
   frequency: string;
+  time_of_day: string;
   start_date: string;
   stop_date: string;
 };
@@ -24,6 +25,7 @@ const emptyMedication = (): MedicationItem => ({
   name: "",
   dosage: "",
   frequency: "",
+  time_of_day: "",
   start_date: "",
   stop_date: "",
 });
@@ -35,14 +37,21 @@ export default function HealthProfileForm() {
   const [notes, setNotes] = useState("");
   const [diagnoses, setDiagnoses] = useState<DiagnosisItem[]>([emptyDiagnosis()]);
   const [medications, setMedications] = useState<MedicationItem[]>([emptyMedication()]);
+  const [savedProfile, setSavedProfile] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     fetch(`${API_BASE}/profile`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Unable to load profile");
+        return res.json();
+      })
       .then((profile) => {
         if (!profile) return;
+        setSavedProfile(profile);
         setName(profile.name || "");
         setAllergies(profile.allergies || "");
         setSpecialists((profile.specialists || []).join(", "));
@@ -54,6 +63,7 @@ export default function HealthProfileForm() {
             name: med.name || "",
             dosage: med.dosage || "",
             frequency: med.frequency || "",
+            time_of_day: med.time_of_day || "",
             start_date: med.start_date || "",
             stop_date: med.stop_date || "",
           })) : [emptyMedication()]
@@ -61,6 +71,9 @@ export default function HealthProfileForm() {
       })
       .catch(() => {
         setStatusMessage("Unable to load profile. Please make sure the backend is running.");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, []);
 
@@ -115,6 +128,8 @@ export default function HealthProfileForm() {
         throw new Error("Unable to save profile");
       }
 
+      const saved = await response.json();
+      setSavedProfile(saved);
       setStatusMessage("Health profile saved successfully.");
     } catch (error) {
       setStatusMessage("Unable to save profile. Please try again.");
@@ -122,6 +137,13 @@ export default function HealthProfileForm() {
       setIsSaving(false);
     }
   };
+
+  const hasProfileData =
+    savedProfile &&
+    (savedProfile.name?.trim() || savedProfile.allergies?.trim() ||
+      (savedProfile.specialists || []).length > 0 || savedProfile.notes?.trim() ||
+      (savedProfile.diagnoses || []).length > 0 ||
+      (savedProfile.medications || []).length > 0);
 
   return (
     <div className="profile-card">
@@ -135,7 +157,14 @@ export default function HealthProfileForm() {
         </button>
       </div>
 
+      <div className="status-banner">
+        MediMatch helps organize your health information. It does not provide medical advice, diagnosis, or treatment recommendations. Always consult your doctor or pharmacist before making healthcare decisions.
+      </div>
+
       <form className="profile-form" onSubmit={onSubmit}>
+        {isLoading ? (
+          <div className="status-banner">Loading your health profile...</div>
+        ) : null}
         <div className="field-group">
           <label htmlFor="name">Your name</label>
           <input id="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Enter your name" />
@@ -243,6 +272,14 @@ export default function HealthProfileForm() {
                   />
                 </div>
                 <div className="field-group">
+                  <label>Time of day</label>
+                  <input
+                    value={medication.time_of_day}
+                    onChange={(event) => updateMedication(index, "time_of_day", event.target.value)}
+                    placeholder="e.g. Morning, Evening"
+                  />
+                </div>
+                <div className="field-group">
                   <label>Start date</label>
                   <input
                     type="date"
@@ -270,10 +307,56 @@ export default function HealthProfileForm() {
 
         {statusMessage ? <div className="status-banner">{statusMessage}</div> : null}
 
-        <button type="submit" className="primary-button" disabled={isSaving}>
+        <button type="submit" className="primary-button" disabled={isSaving || isLoading}>
           {isSaving ? "Saving..." : "Save Health Profile"}
         </button>
       </form>
+
+      {hasProfileData ? (
+        <section className="profile-section">
+          <h3>Saved Health Profile</h3>
+          <div className="feature-card">
+            <p><strong>Name:</strong> {savedProfile.name || "(none)"}</p>
+            <p><strong>Allergies:</strong> {savedProfile.allergies || "None recorded"}</p>
+            <p><strong>Specialists:</strong> {(savedProfile.specialists || []).join(", ") || "None recorded"}</p>
+            <p><strong>Notes:</strong> {savedProfile.notes || "No notes recorded"}</p>
+            <div>
+              <strong>Diagnoses:</strong>
+              {(savedProfile.diagnoses || []).length === 0 ? (
+                <p>No diagnoses recorded.</p>
+              ) : (
+                <ul>
+                  {(savedProfile.diagnoses || []).map((diag: any, index: number) => (
+                    <li key={index}>
+                      <strong>{diag.name}</strong>
+                      {diag.details ? ` — ${diag.details}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div>
+              <strong>Medications:</strong>
+              {(savedProfile.medications || []).length === 0 ? (
+                <p>No medications recorded.</p>
+              ) : (
+                <ul>
+                  {(savedProfile.medications || []).map((med: any, index: number) => (
+                    <li key={index}>
+                      <strong>{med.name}</strong>
+                      {med.dosage ? ` — ${med.dosage}` : ""}
+                      {med.frequency ? `, ${med.frequency}` : ""}
+                      {med.time_of_day ? `, ${med.time_of_day}` : ""}
+                      {med.start_date ? `, starts ${med.start_date}` : ""}
+                      {med.stop_date ? `, stops ${med.stop_date}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

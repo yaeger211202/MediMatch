@@ -132,7 +132,7 @@ async def read_profile(db: Session = Depends(get_db)):
         notes=user.notes,
         diagnoses=user.diagnoses,
         medications=user.medications,
-    )
+    ).model_dump()
 
 
 @router.post("/profile", response_model=schemas.UserProfile)
@@ -167,6 +167,7 @@ async def update_profile(profile: schemas.UserProfileCreate, db: Session = Depen
                 name=medication.name,
                 dosage=medication.dosage or "",
                 frequency=medication.frequency or "",
+                time_of_day=medication.time_of_day or "",
                 start_date=medication.start_date,
                 stop_date=medication.stop_date,
             )
@@ -181,7 +182,7 @@ async def update_profile(profile: schemas.UserProfileCreate, db: Session = Depen
         notes=user.notes,
         diagnoses=user.diagnoses,
         medications=user.medications,
-    )
+    ).model_dump()
 
 
 @router.get("/timeline", response_model=list[schemas.MedicationChangeResponse])
